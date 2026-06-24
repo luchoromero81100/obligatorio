@@ -1,0 +1,314 @@
+/* =========================================================
+   JobHunter - Estilos (solo desktop, base con flexbox)
+   ========================================================= */
+
+/* --- Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f7f6;
+    color: #2c3e50;
+    min-height: 100vh;
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+h3 {
+    margin-bottom: 5px;
+}
+
+h4 {
+    margin-bottom: 5px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #e0e0e0;
+    margin: 10px 0;
+}
+
+a {
+    color: #3498db;
+}
+
+p {
+    line-height: 1.5;
+}
+
+/* =========================================================
+   Navbar
+   ========================================================= */
+.navbar {
+    background: #2d3436;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo-nombre {
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.mira-logo {
+    color: #27ae60;
+    margin: 0 2px;
+    font-size: 1.1em;
+}
+
+/* =========================================================
+   Inputs y botones (ancho automático por defecto)
+   ========================================================= */
+input,
+select,
+textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+button {
+    padding: 10px 18px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+/* Variantes de color de botones */
+.btn-success {
+    background-color: #3498db;
+}
+
+.btn-success:hover {
+    background-color: #2689cc;
+}
+
+.btn-secundario {
+    background-color: #7f8c8d;
+}
+
+.btn-secundario:hover {
+    background-color: #6c7a7b;
+}
+
+.btn-logout {
+    background-color: #e74c3c;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+}
+
+.btn-destacada {
+    background-color: #f39c12;
+}
+
+.btn-destacada:hover {
+    background-color: #e08e0b;
+}
+
+/* Login y registro */
+#seccion-login,
+#seccion-registro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh;
+}
+
+.contenedor-login {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 380px;
+}
+
+.contenedor-login h2 {
+    text-align: center;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* En login/registro los campos y botones ocupan todo el ancho del recuadro */
+.contenedor-login input,
+.contenedor-login select,
+.contenedor-login button {
+    width: 100%;
+}
+
+/* =========================================================
+   Header interno (paneles ya logueados)
+   ========================================================= */
+.header-interno {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 40px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header-interno .acciones {
+    display: flex;
+    gap: 12px;
+}
+
+.saludo {
+    font-size: 1.1em;
+}
+
+/* =========================================================
+   Contenido principal
+   ========================================================= */
+.contenido-principal {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Filas de controles (buscador, checkbox, etc.) */
+.barra-controles {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* El buscador no debe ser gigante */
+.barra-controles input[type="text"] {
+    flex: 1;
+    max-width: 350px;
+}
+
+/* =========================================================
+   Formulario de creación / edición de oferta (admin)
+   ========================================================= */
+.contenedor-formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.contenedor-formulario input,
+.contenedor-formulario select,
+.contenedor-formulario textarea,
+.contenedor-formulario button {
+    width: 100%;
+}
+
+/* Label del checkbox alineado con su casilla */
+.contenedor-formulario label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.contenedor-formulario label input {
+    width: auto;
+}
+
+/* =========================================================
+   Tablas (contenido generado por JS)
+   ========================================================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+th,
+td {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+    vertical-align: middle;
+}
+
+thead th {
+    background-color: #f2f2f2;
+}
+
+/* Cabecera distinta para el catálogo de destacadas */
+.tabla-destacadas thead th {
+    background-color: #fffacd;
+}
+
+/* Celda de acciones: botones chicos, en línea y con separación */
+td .acciones-tabla {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+td button {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+/* =========================================================
+   Mensajes
+   ========================================================= */
+.mensaje {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.error-msg {
+    color: #e74c3c;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.resultado-msg {
+    font-weight: bold;
+    margin-top: 10px;
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHunter - Sistema de Postulaciones</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo-nombre">
+            J<span class="mira-logo">⌖</span>bHunter
+        </div>
+    </nav>
+
+    <section id="seccion-login">
+        <div class="contenedor-login">
+            <h2>Ingreso al Sistema</h2>
+            <div class="campo">
+                <label for="txt-login-usuario">Usuario:</label>
+                <input type="text" id="txt-login-usuario" placeholder="Ej: juan99">
+            </div>
+            <div class="campo">
+                <label for="txt-login-password">Contraseña:</label>
+                <input type="password" id="txt-login-password" placeholder="••••••••">
+            </div>
+            <button id="btn-login-ingresar">Ingresar</button>
+            <p>¿No tenés cuenta?
+                <a href="javascript:void(0)" onclick="mostrarSeccion('seccion-registro')">Registrate aquí</a>
+            </p>
+            <p id="lbl-login-error" class="error-msg"></p>
+        </div>
+    </section>
+
+    <section id="seccion-registro" style="display: none;">
+        <div class="contenedor-login">
+            <h2>Crear Cuenta</h2>
+            <div class="campo">
+                <label>Nombre de usuario:</label>
+                <input type="text" id="reg-usuario" placeholder="Mínimo 5 caracteres">
+            </div>
+            <div class="campo">
+                <label>Contraseña:</label>
+                <input type="password" id="reg-password" placeholder="1 May, 1 min, 1 num (min 5)">
+            </div>
+            <div class="campo">
+                <label>Nombre completo:</label>
+                <input type="text" id="reg-nombre" placeholder="Nombre completo">
+            </div>
+            <div class="campo">
+                <label>Nivel de experiencia:</label>
+                <select id="reg-nivel">
+                    <option value="Junior">Junior</option>
+                    <option value="Semi-Senior">Semi-Senior</option>
+                    <option value="Senior">Senior</option>
+                </select>
+            </div>
+            <div class="campo">
+                <label>Área de interés:</label>
+                <select id="reg-area">
+                    <option value="Tecnología">Tecnología</option>
+                    <option value="Diseño">Diseño</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Administración">Administración</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+            <button id="btn-registrar-usuario" class="btn-success">Registrarse</button>
+            <button class="btn-secundario" onclick="mostrarSeccion('seccion-login')">Volver</button>
+            <p id="lbl-registro-resultado" class="resultado-msg"></p>
+        </div>
+    </section>
+
+    <section id="seccion-postulante" style="display: none;">
+        <header class="header-interno">
+            <span class="saludo">Bienvenido, <strong id="nombre-postulante-logueado"></strong>!</span>
+            <div class="acciones">
+                <button class="btn-destacada" onclick="mostrarSeccion('seccion-destacadas'); mostrarOfertasDestacadas();">Ver
+                    Destacadas</button>
+                <button onclick="mostrarSeccion('seccion-mis-postulaciones'); mostrarMisPostulaciones();">Mis
+                    Postulaciones</button>
+                <button class="btn-logout" onclick="mostrarSeccion('seccion-login')">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <main class="contenido-principal">
+            <h3>Panel de Postulaciones</h3>
+            <div class="barra-controles">
+                <label for="txt-buscar-oferta">Buscar por puesto o empresa:</label>
+                <input type="text" id="txt-buscar-oferta" placeholder="Escribí un puesto o empresa"
+                    oninput="mostrarOfertasPostulante()">
+            </div>
+            <div class="barra-controles">
+                <input type="checkbox" id="chk-ver-todas" onclick="mostrarOfertasPostulante()" checked>
+                <label for="chk-ver-todas">Mostrar solo mi área de interés</label>
+            </div>
+            <div id="contenedor-ofertas-postulante"></div>
+        </main>
+    </section>
+
+    <section id="seccion-destacadas" style="display: none;">
+        <header class="header-interno">
+            <span class="saludo">Catálogo de <strong>Ofertas Destacadas</strong></span>
+            <div class="acciones">
+                <button onclick="mostrarSeccion('seccion-postulante'); mostrarOfertasPostulante();"
+                    class="btn-secundario">Volver a Mi Panel</button>
+                <button class="btn-logout" onclick="mostrarSeccion('seccion-login')">Cerrar Sesión</button>
+            </div>
+        </header>
+        <main class="contenido-principal">
+            <h3>🌟 Ofertas Estelares</h3>
+            <div id="contenedor-ofertas-destacadas"></div>
+        </main>
+    </section>
+
+    <section id="seccion-mis-postulaciones" style="display: none;">
+        <header class="header-interno">
+            <span class="saludo">Mis <strong>Postulaciones</strong></span>
+            <div class="acciones">
+                <button onclick="mostrarSeccion('seccion-postulante'); mostrarOfertasPostulante();"
+                    class="btn-secundario">Volver a Mi Panel</button>
+                <button class="btn-logout" onclick="mostrarSeccion('seccion-login')">Cerrar Sesión</button>
+            </div>
+        </header>
+        <main class="contenido-principal">
+            <h3>Historial de mis solicitudes</h3>
+            <div id="contenedor-mis-postulaciones"></div>
+        </main>
+    </section>
+
+    <section id="seccion-admin" style="display: none;">
+        <header class="header-interno">
+            <span class="saludo">Panel de Control: <strong>Administrador</strong></span>
+            <div class="acciones">
+                <button onclick="mostrarSeccion('seccion-admin-ofertas'); mostrarListadoOfertasAdmin();">Listado de
+                    Ofertas</button>
+                <button onclick="mostrarSeccion('seccion-admin-estadisticas'); mostrarEstadisticas();">Estadísticas</button>
+                <button class="btn-logout" onclick="mostrarSeccion('seccion-login')">Cerrar Sesión</button>
+            </div>
+        </header>
+        <main class="contenido-principal">
+            <h3>Gestión General del Sistema</h3>
+            <hr>
+            <div class="contenedor-formulario">
+                <h4>Crear Nueva Oferta Laboral</h4>
+
+                <input type="text" id="txt-admin-titulo" placeholder="Título de la oferta">
+                <input type="text" id="txt-admin-empresa" placeholder="Empresa">
+                <textarea id="txt-admin-descripcion" placeholder="Descripción"></textarea>
+
+                <select id="sel-admin-nivel">
+                    <option value="Junior">Junior</option>
+                    <option value="Semi-Senior">Semi-Senior</option>
+                    <option value="Senior">Senior</option>
+                </select>
+
+                <select id="sel-admin-area">
+                    <option value="Tecnología">Tecnología</option>
+                    <option value="Diseño">Diseño</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Administración">Administración</option>
+                    <option value="Otros">Otros</option>
+                </select>
+
+                <input type="number" id="num-admin-limite" placeholder="Límite postulaciones">
+                <input type="number" id="num-admin-vacantes" placeholder="Vacantes">
+                <label><input type="checkbox" id="chk-admin-destacada"> Oferta Destacada</label>
+
+                <button id="btn-admin-crear-oferta" class="btn-success">Publicar Oferta</button>
+                <p id="lbl-admin-oferta-resultado" class="resultado-msg"></p>
+            </div>
+
+            <div id="contenedor-postulaciones-admin">
+                <h4>Postulaciones Recibidas</h4>
+                <div id="lista-pendientes"></div>
+            </div>
+        </main>
+    </section>
+
+    <section id="seccion-admin-ofertas" style="display: none;">
+        <header class="header-interno">
+            <span class="saludo">Listado de <strong>Ofertas</strong></span>
+            <div class="acciones">
+                <button onclick="mostrarSeccion('seccion-admin')" class="btn-secundario">Volver al Panel</button>
+                <button class="btn-logout" onclick="mostrarSeccion('seccion-login')">Cerrar Sesión</button>
+            </div>
+        </header>
+        <main class="contenido-principal">
+            <h3>Todas las ofertas (Activas / Inactivas / Cerradas)</h3>
+            <div id="contenedor-editar-oferta"></div>
+            <div id="contenedor-listado-ofertas"></div>
+        </main>
+    </section>
+
+    <section id="seccion-admin-estadisticas" style="display: none;">
+        <header class="header-interno">
+            <span class="saludo">Panel de <strong>Estadísticas</strong></span>
+            <div class="acciones">
+                <button onclick="mostrarSeccion('seccion-admin')" class="btn-secundario">Volver al Panel</button>
+                <button class="btn-logout" onclick="mostrarSeccion('seccion-login')">Cerrar Sesión</button>
+            </div>
+        </header>
+        <main class="contenido-principal">
+            <h3>Estadísticas del sistema</h3>
+            <div class="barra-controles">
+                <label for="txt-buscar-estadistica">Buscar por título:</label>
+                <input type="text" id="txt-buscar-estadistica" placeholder="Escribí un título"
+                    oninput="mostrarEstadisticas()">
+            </div>
+            <div id="contenedor-estadisticas"></div>
+        </main>
+    </section>
+
+    <script src="../js/postulante.js"></script>
+    <script src="../js/admin.js"></script>
+    <script src="../js/postulacion.js"></script>
+    <script src="../js/ofertaLaboral.js"></script>
+    <script src="../js/sistema.js"></script>
+    <script src="../js/datosPrecargados.js"></script>
+    <script src="../js/pantallas.js"></script>
+</body>
+
+</html>
