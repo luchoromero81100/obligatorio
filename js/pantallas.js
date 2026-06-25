@@ -1,34 +1,25 @@
-// =========================================================================
-//  UI (pantallas + eventos). Solo recolecta datos de inputs, llama a métodos
-//  del Sistema y muestra resultados. Nunca toca los arrays privados directo.
-// =========================================================================
+//  acá creo el html, llamando a las fucniones de sistema para recibir las tablas y crearlas segun lo que retronen
 
-// --- VARIABLES DE SESIÓN GLOBAL ---
+// creo las variables para luego asignarle nuevos valores segun el login
 let usuarioLogueado = null;
 let rolLogueado = "";
 
-// --- ARRANQUE: conectamos los botones fijos del HTML ---
-window.addEventListener("load", function () {
-    // Botón de login
+// 
+window.addEventListener("load", function () { //window es un objeto que representa la pagina, y espera a "load"
+    // Botón de LOG IN
     let btnIngresar = document.querySelector("#btn-login-ingresar");
-    if (btnIngresar != null) {
-        btnIngresar.addEventListener("click", procesarLogin);
-    }
+    btnIngresar.addEventListener("click", procesarLogin);
 
-    // Botón de crear oferta (admin)
+    // Botón de CREAR OFERTA (ADMIN)
     let btnCrearOferta = document.querySelector("#btn-admin-crear-oferta");
-    if (btnCrearOferta != null) {
-        btnCrearOferta.addEventListener("click", procesarAltaOferta);
-    }
+    btnCrearOferta.addEventListener("click", procesarAltaOferta);
 
-    // Botón de registro de postulante
+    // Botón de REGISTRO DE POSTULANTE
     let btnRegistro = document.querySelector("#btn-registrar-usuario");
-    if (btnRegistro != null) {
-        btnRegistro.addEventListener("click", procesarRegistro);
-    }
+    btnRegistro.addEventListener("click", procesarRegistro);
 });
 
-// --- LOGIN ---
+//LOGEO:
 function procesarLogin() {
     let txtUser = document.querySelector("#txt-login-usuario").value.trim();
     let txtPass = document.querySelector("#txt-login-password").value;
@@ -63,7 +54,7 @@ function procesarLogin() {
         return;
     }
 
-    // Intentar como admin
+    // y despues intento como admin
     let adminEncontrado = miSistema.loginAdmin(txtUser, txtPass);
     if (adminEncontrado == null) {
         lblError.innerText = "Contraseña incorrecta";
@@ -75,87 +66,66 @@ function procesarLogin() {
     mostrarPostulacionesAdmin();
 }
 
-// --- REGISTRO DE POSTULANTE ---
+// REGISTRO COMO POSTULANTE
 function procesarRegistro() {
-    let u = document.querySelector("#reg-usuario").value;
-    let p = document.querySelector("#reg-password").value;
-    let n = document.querySelector("#reg-nombre").value;
-    let niv = document.querySelector("#reg-nivel").value;
-    let area = document.querySelector("#reg-area").value;
+    let u = document.querySelector("#reg-usuario").value; //nombre de usuario
+    let p = document.querySelector("#reg-password").value; // contraseña
+    let n = document.querySelector("#reg-nombre").value; // nombre completo
+    let niv = document.querySelector("#reg-nivel").value; //nivel
+    let area = document.querySelector("#reg-area").value; //area de interes
 
-    let resultado = miSistema.registrarPostulante(u, p, n, niv, area);
+    let resultado = miSistema.registrarPostulante(u, p, n, niv, area); //llamo a la funcion del sistema
 
-    let labelResultado = document.querySelector("#lbl-registro-resultado");
+    let labelResultado = document.querySelector("#lbl-registro-resultado"); // le muestro si fue exitoso o no
     labelResultado.innerText = resultado;
 
-    // Si fue exitoso, volvemos al login después de 1.5 segundos
+    // Si fue exitoso, volvemos al login, idealmente tenemos que poner un timer
     if (resultado == "Registro exitoso") {
         mostrarSeccion("seccion-login");
     }
 }
 
-// --- NAVEGACIÓN ENTRE SECCIONES ---
+// Navecion entre secciones
 function mostrarSeccion(idSeccionAMostrar) {
     // Si vamos al login, limpiamos la sesión y los inputs
     if (idSeccionAMostrar == "seccion-login") {
-        usuarioLogueado = null;
+        usuarioLogueado = null; //volvemos a arrancar de 0
         rolLogueado = "";
 
         let inputUser = document.querySelector("#txt-login-usuario");
         let inputPass = document.querySelector("#txt-login-password");
         let lblError = document.querySelector("#lbl-login-error");
 
-        if (inputUser != null) { inputUser.value = ""; }
-        if (inputPass != null) { inputPass.value = ""; }
-        if (lblError != null) { lblError.innerText = ""; }
+        inputUser.value = "";
+        inputPass.value = "";
+        lblError.innerText = ""; //vaciamos todos los inputs
     }
 
     let secciones = ["seccion-login", "seccion-postulante", "seccion-admin", "seccion-registro", "seccion-destacadas", "seccion-mis-postulaciones", "seccion-admin-ofertas", "seccion-admin-estadisticas"];
+    // creo un array de secciones
 
+    // le sacamos la clase "activa" a todas y se la pongo solo a la que quiero mostrar.
     for (let i = 0; i < secciones.length; i++) {
-        let id = secciones[i];
-        let elemento = document.querySelector("#" + id);
-
-        if (elemento != null) {
-            if (id == idSeccionAMostrar) {
-                // Login y registro se centran con flex; el resto en bloque
-                if (id == "seccion-login" || id == "seccion-registro") {
-                    elemento.style.display = "flex";
-                } else {
-                    elemento.style.display = "block";
-                }
-            } else {
-                elemento.style.display = "none";
-            }
-        }
+        let elemento = document.querySelector("#" + secciones[i]);
+        elemento.classList.remove("activa");
     }
+    document.querySelector("#" + idSeccionAMostrar).classList.add("activa"); // las clases activas tienen display block
+    //por defecto si no, son display none
 }
 
-// --- VISUALIZAR LAS OFERTAS (POSTULANTE) ---
+// VISUALIZAR OFERTAS COMO POSTULANTE
 function mostrarOfertasPostulante() {
     let contenedor = document.querySelector("#contenedor-ofertas-postulante");
-    if (contenedor == null) { return; }
 
-    if (usuarioLogueado == null) {
-        contenedor.innerHTML = "<p>Error: No se encontró la sesión del postulante.</p>";
-        return;
-    }
+    let chkFiltro = document.querySelector("#chk-ver-todas"); 
+    let soloArea = chkFiltro.checked; // se revisa el estado del checkbox
 
-    // Estado del checkbox: si está marcado, solo su área de interés
-    let chkFiltro = document.querySelector("#chk-ver-todas");
-    let soloArea = true;
-    if (chkFiltro != null) {
-        soloArea = chkFiltro.checked;
-    }
+    let listaOfertas = miSistema.obtenerOfertasParaPostulante(usuarioLogueado, soloArea); // llamo a la funcion para crear las 
+    //ofertas segun postulante y el estado del checkbox
 
-    let listaOfertas = miSistema.obtenerOfertasParaPostulante(usuarioLogueado, soloArea);
-
-    // Buscador por puesto (título) o empresa
-    let textoBusqueda = "";
+    // buscador por puesto o empresa
     let inputBusqueda = document.querySelector("#txt-buscar-oferta");
-    if (inputBusqueda != null) {
-        textoBusqueda = inputBusqueda.value.toLowerCase();
-    }
+    let textoBusqueda = inputBusqueda.value.toLowerCase();
 
     let listaFiltrada = [];
     for (let i = 0; i < listaOfertas.length; i++) {
@@ -224,97 +194,73 @@ function mostrarOfertasPostulante() {
     contenedor.innerHTML = tablaHTML;
 }
 
-// --- ALTA DE OFERTAS (ADMINISTRADOR) ---
+//DAR DE ALTA DE OFERTAS NUEVAS (ADMINISTRADOR)
 function procesarAltaOferta() {
     let titulo = document.querySelector("#txt-admin-titulo").value.trim();
     let empresa = document.querySelector("#txt-admin-empresa").value.trim();
     let descripcion = document.querySelector("#txt-admin-descripcion").value.trim();
     let nivel = document.querySelector("#sel-admin-nivel").value;
     let area = document.querySelector("#sel-admin-area").value;
-    let limiteStr = document.querySelector("#num-admin-limite").value;
-    let vacantesStr = document.querySelector("#num-admin-vacantes").value;
+    let limite = Number(document.querySelector("#num-admin-limite").value);
+    let vacantes = Number(document.querySelector("#num-admin-vacantes").value);
     let destacada = document.querySelector("#chk-admin-destacada").checked;
     let lbl = document.querySelector("#lbl-admin-oferta-resultado");
 
-    // Convertimos los números; si están vacíos o no son válidos quedan en 0
-    // y el Sistema devuelve el mensaje de validación correspondiente.
-    let limite = Number(limiteStr);
-    let vacantes = Number(vacantesStr);
-    if (isNaN(limite)) { limite = 0; }
-    if (isNaN(vacantes)) { vacantes = 0; }
+    if (isNaN(limite)) { limite = 0; } 
+    if (isNaN(vacantes)) { vacantes = 0; } // si es true lo forzamos y despues lo validamos
 
-    // El Sistema hace todas las validaciones y devuelve el mensaje exacto
+    // llamamos a ssitema hace todas las validaciones y retorne el mensaje 
     let respuesta = miSistema.agregarOferta(titulo, empresa, descripcion, nivel, area, limite, vacantes, destacada);
 
     lbl.innerText = respuesta;
     if (respuesta.includes("correctamente")) {
         lbl.style.color = "green";
-    } else {
-        lbl.style.color = "red";
-    }
-
-    if (respuesta.includes("correctamente")) {
-        // Limpiamos los inputs
         document.querySelector("#txt-admin-titulo").value = "";
         document.querySelector("#txt-admin-empresa").value = "";
         document.querySelector("#txt-admin-descripcion").value = "";
         document.querySelector("#num-admin-limite").value = "";
         document.querySelector("#num-admin-vacantes").value = "";
         document.querySelector("#chk-admin-destacada").checked = false;
+    } else {
+        lbl.style.color = "red";
     }
 }
 
-// --- PROCESAR LA POSTULACIÓN (POSTULANTE) ---
-window.procesarPostulacion = function (idOferta) {
-    // Detectamos en qué pantalla estamos para mostrar el mensaje en el label correcto
-    let lblMensaje;
+// PROCESAR LA POSTULACIÓN (POSTULANTE) 
+function procesarPostulacion(idOferta) {
+    // Detectamos en que pantalla estamos para mostrar el mensaje en el label correcto
     let seccionDestacadas = document.querySelector("#seccion-destacadas");
+    let lblMensaje = null;
 
-    if (seccionDestacadas != null && seccionDestacadas.style.display != "none") {
+    if (seccionDestacadas.classList.contains("activa")) {
         lblMensaje = document.querySelector("#lbl-mensaje-postulacion-destacada");
     } else {
         lblMensaje = document.querySelector("#lbl-mensaje-postulacion");
     }
 
-    if (lblMensaje == null) {
-        alert("Ocurrió un error: No se encontró el contenedor de mensajes.");
-        return;
-    }
-
-    if (usuarioLogueado == null) {
-        lblMensaje.innerText = "Error: Debes iniciar sesión.";
-        return;
-    }
-
     let ofertaEncontrada = miSistema.buscarOfertaPorId(idOferta);
-    if (ofertaEncontrada == null) {
-        lblMensaje.innerText = "Error: Oferta no encontrada.";
-        return;
-    }
-
     let mensajeResultado = miSistema.crearPostulacion(usuarioLogueado, ofertaEncontrada);
 
     if (mensajeResultado == "Postulación realizada correctamente") {
-        // Refrescamos la tabla (lo que destruye el label), luego lo buscamos de nuevo y escribimos
-        if (seccionDestacadas != null && seccionDestacadas.style.display != "none") {
-            mostrarOfertasDestacadas();
+        // Refrescamos la tabla (pero me rompe el label luego entonces lo buscamos de nuevo y escribimos)
+        if (seccionDestacadas.classList.contains("activa")) {
+            mostrarOfertasDestacadas(); 
             let lbl = document.querySelector("#lbl-mensaje-postulacion-destacada");
-            if (lbl != null) { lbl.innerText = "✔ Postulación exitosa"; lbl.style.color = "green"; }
+            if (lbl != null) { lbl.innerText = "Postulación exitosa!"; lbl.style.color = "green"; }
         } else {
             mostrarOfertasPostulante();
             let lbl = document.querySelector("#lbl-mensaje-postulacion");
-            if (lbl != null) { lbl.innerText = "✔ Postulación exitosa"; lbl.style.color = "green"; }
+            if (lbl != null) { lbl.innerText = "Postulación exitosa!"; lbl.style.color = "green"; }
         }
     } else {
         lblMensaje.innerText = mensajeResultado;
         lblMensaje.style.color = "red";
     }
-};
+}
 
-// --- HISTORIAL DE POSTULACIONES (POSTULANTE) ---
+// HISTORIAL DE POSTULACIONES (POSTULANTE)
 function mostrarMisPostulaciones() {
     let contenedor = document.querySelector("#contenedor-mis-postulaciones");
-    if (contenedor == null) { return; }
 
     let misPostulaciones = miSistema.obtenerPostulacionesDePostulante(usuarioLogueado);
 
@@ -341,7 +287,7 @@ function mostrarMisPostulaciones() {
     for (let i = 0; i < misPostulaciones.length; i++) {
         let p = misPostulaciones[i];
 
-        // Color según el estado para mejorar la lectura
+        // Color segun el estado para mejorar la lectura
         let colorEstado = "orange"; // Pendiente
         if (p.estado == "Aceptada") {
             colorEstado = "green";
@@ -365,16 +311,20 @@ function mostrarMisPostulaciones() {
     contenedor.innerHTML = tablaHTML;
 }
 
-// --- CATÁLOGO DE DESTACADAS (POSTULANTE) ---
+// CATÁLOGO DE DESTACADAS (POSTULANTE)
 function mostrarOfertasDestacadas() {
     let contenedor = document.querySelector("#contenedor-ofertas-destacadas");
-    if (!contenedor) return;
 
-    // 1. Obtenemos todas las destacadas
+    // Obtenemos todas las destacadas
     let listaCompleta = miSistema.obtenerOfertasDestacadas();
 
     // 2. Filtramos: solo dejamos las que el usuario NO se haya postulado aún
-    let listaFiltrada = listaCompleta.filter(o => !miSistema.yaSePostulo(usuarioLogueado, o));
+    let listaFiltrada = [];
+    for (let i = 0; i < listaCompleta.length; i++) {
+        if (miSistema.yaSePostulo(usuarioLogueado, listaCompleta[i]) == false) {
+            listaFiltrada.push(listaCompleta[i]);
+        }
+    }
 
     if (listaFiltrada.length == 0) {
         contenedor.innerHTML = "<p>No hay más ofertas destacadas disponibles para ti.</p>";
@@ -386,16 +336,22 @@ function mostrarOfertasDestacadas() {
         <tbody>`;
 
     for (let o of listaFiltrada) {
-        tablaHTML += `<tr><td>${o.id}</td><td>${o.titulo}</td><td>${o.empresa}</td><td>${o.nivelRequerido}</td><td>${o.area}</td>
-        <td><button onclick="procesarPostulacion('${o.id}')">Postularme</button></td></tr>`;
+        tablaHTML += `
+            <tr>
+                <td>${o.id}</td>
+                <td>${o.titulo}</td>
+                <td>${o.empresa}</td>
+                <td>${o.nivelRequerido}</td>
+                <td>${o.area}</td>
+                <td><button onclick="procesarPostulacion('${o.id}')">Postularme</button></td>
+            </tr>`;
     }
     tablaHTML += `</tbody></table><p id="lbl-mensaje-postulacion-destacada"></p></div>`;
     contenedor.innerHTML = tablaHTML;
 }
-// --- POSTULACIONES PENDIENTES (ADMIN) ---
+// POSTULACIONES PENDIENTES (ADMIN) 
 function mostrarPostulacionesAdmin() {
     let contenedor = document.querySelector("#lista-pendientes");
-    if (contenedor == null) { return; }
 
     let lista = miSistema.obtenerPostulacionesPendientes();
 
@@ -434,30 +390,27 @@ function mostrarPostulacionesAdmin() {
     contenedor.innerHTML = html;
 }
 
-// Acepta una postulación (con toda la cascada de la Fase 8)
-window.procesarAceptacion = function (idPostulacion) {
+// Acepta una postulación 
+function procesarAceptacion(idPostulacion) {
     let resultado = miSistema.aceptarPostulacion(idPostulacion);
     alert(resultado);
     mostrarPostulacionesAdmin();
 };
 
 // Rechazo manual de una postulación
-window.procesarRechazo = function (idPostulacion) {
+function procesarRechazo(idPostulacion) {
     let resultado = miSistema.modificarEstadoPostulacion(idPostulacion, "Rechazada");
     alert(resultado);
     mostrarPostulacionesAdmin();
 };
 
-// =========================================================================
-//  LISTADO COMPLETO DE OFERTAS (ADMIN) — Editar / Cerrar
-// =========================================================================
+//  LISTADO COMPLETO DE OFERTAS (ADMIN) 
 function mostrarListadoOfertasAdmin() {
     let contenedor = document.querySelector("#contenedor-listado-ofertas");
-    if (contenedor == null) { return; }
 
     // Limpiamos el formulario de edición si estaba abierto
     let contEditar = document.querySelector("#contenedor-editar-oferta");
-    if (contEditar != null) { contEditar.innerHTML = ""; }
+    contEditar.innerHTML = "";
 
     let ofertas = miSistema.obtenerTodasLasOfertas();
 
@@ -509,13 +462,13 @@ function mostrarListadoOfertasAdmin() {
 }
 
 // Cierre lógico de una oferta (queda en el array con estado "Cerrada")
-window.procesarCerrarOferta = function (idOferta) {
+function procesarCerrarOferta(idOferta) {
     let resultado = miSistema.cerrarOferta(idOferta);
     alert(resultado);
     mostrarListadoOfertasAdmin();
 };
 
-// Arma las <option> de un select marcando la opción seleccionada (evita repetir código)
+// Armamos las option del select marcando la opción seleccionada y evitamos repetir cod
 function armarOpciones(opciones, seleccionada) {
     let html = "";
     for (let i = 0; i < opciones.length; i++) {
@@ -528,13 +481,11 @@ function armarOpciones(opciones, seleccionada) {
     return html;
 }
 
-// Muestra un formulario básico para editar la oferta elegida
-window.mostrarFormularioEditar = function (idOferta) {
+// Muestra un formulario medio basico para editar la oferta elegida
+function mostrarFormularioEditar(idOferta) {
     let o = miSistema.buscarOfertaPorId(idOferta);
-    if (o == null) { return; }
 
     let cont = document.querySelector("#contenedor-editar-oferta");
-    if (cont == null) { return; }
 
     let niveles = ["Junior", "Semi-Senior", "Senior"];
     let areas = ["Tecnología", "Diseño", "Marketing", "Administración", "Otros"];
@@ -544,25 +495,26 @@ window.mostrarFormularioEditar = function (idOferta) {
         destacadaChecked = "checked";
     }
 
-    let html = "<div class='contenedor-formulario'>";
-    html += "<h4>Editar oferta " + o.id + "</h4>";
-    html += "<div class='campo'><label>Título:</label><input type='text' id='edit-titulo' value='" + o.titulo + "'></div>";
-    html += "<div class='campo'><label>Empresa:</label><input type='text' id='edit-empresa' value='" + o.empresa + "'></div>";
-    html += "<div class='campo'><label>Descripción:</label><input type='text' id='edit-descripcion' value='" + o.descripcion + "'></div>";
-    html += "<div class='campo'><label>Nivel:</label><select id='edit-nivel'>" + armarOpciones(niveles, o.nivelRequerido) + "</select></div>";
-    html += "<div class='campo'><label>Área:</label><select id='edit-area'>" + armarOpciones(areas, o.area) + "</select></div>";
-    html += "<div class='campo'><label>Límite:</label><input type='number' id='edit-limite' value='" + o.limitePostulaciones + "'></div>";
-    html += "<div class='campo'><label>Vacantes:</label><input type='number' id='edit-vacantes' value='" + o.cantidadVacantes + "'></div>";
-    html += "<label><input type='checkbox' id='edit-destacada' " + destacadaChecked + "> Destacada</label>";
-    html += "<button class='btn-success' onclick=\"guardarEdicionOferta('" + o.id + "')\">Guardar</button>";
-    html += "<p id='lbl-edit-resultado' class='resultado-msg'></p>";
-    html += "</div>";
+    let html = `
+        <div class='contenedor-formulario'>
+            <h4>Editar oferta ${o.id}</h4>
+            <div class='campo'><label>Título:</label><input type='text' id='edit-titulo' value='${o.titulo}'></div>
+            <div class='campo'><label>Empresa:</label><input type='text' id='edit-empresa' value='${o.empresa}'></div>
+            <div class='campo'><label>Descripción:</label><input type='text' id='edit-descripcion' value='${o.descripcion}'></div>
+            <div class='campo'><label>Nivel:</label><select id='edit-nivel'>${armarOpciones(niveles, o.nivelRequerido)}</select></div>
+            <div class='campo'><label>Área:</label><select id='edit-area'>${armarOpciones(areas, o.area)}</select></div>
+            <div class='campo'><label>Límite:</label><input type='number' id='edit-limite' value='${o.limitePostulaciones}'></div>
+            <div class='campo'><label>Vacantes:</label><input type='number' id='edit-vacantes' value='${o.cantidadVacantes}'></div>
+            <label><input type='checkbox' id='edit-destacada' ${destacadaChecked}> Destacada</label>
+            <button class='btn-success' onclick="guardarEdicionOferta('${o.id}')">Guardar</button>
+            <p id='lbl-edit-resultado' class='resultado-msg'></p>
+        </div>`;
 
     cont.innerHTML = html;
 };
 
-// Guarda los cambios del formulario de edición
-window.guardarEdicionOferta = function (idOferta) {
+// guardar los cambios del formulario de edición
+function guardarEdicionOferta(idOferta) {
     let titulo = document.querySelector("#edit-titulo").value.trim();
     let empresa = document.querySelector("#edit-empresa").value.trim();
     let descripcion = document.querySelector("#edit-descripcion").value.trim();
@@ -579,28 +531,21 @@ window.guardarEdicionOferta = function (idOferta) {
         lbl.innerText = resultado;
     }
 
-    // Refrescamos el listado (si se guardó bien, el formulario se cierra)
+    // actualizamos el listado (si se guardó bien, el formulario se cierra)
     if (resultado.includes("correctamente")) {
         mostrarListadoOfertasAdmin();
-        // Recargamos postulaciones y destacadas para reflejar los datos editados en tiempo real
+        // recargamos  postulaciones y destacadas para reflejar los datos editados en tiempo real
         mostrarPostulacionesAdmin();
         mostrarOfertasDestacadas();
     }
 };
 
-// =========================================================================
 //  ESTADÍSTICAS (ADMIN)
-// =========================================================================
 function mostrarEstadisticas() {
     let contenedor = document.querySelector("#contenedor-estadisticas");
-    if (contenedor == null) { return; }
 
-    // Texto del buscador por título (en minúsculas para comparar)
-    let filtro = "";
-    let filtroEl = document.querySelector("#txt-buscar-estadistica");
-    if (filtroEl != null) {
-        filtro = filtroEl.value.toLowerCase();
-    }
+    // texto del buscador por título (en minúsculas para comparar)
+    let filtro = document.querySelector("#txt-buscar-estadistica").value.toLowerCase();
 
     let lista = miSistema.estadisticasPorOferta();
 

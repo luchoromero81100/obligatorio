@@ -1,4 +1,4 @@
-// molde simple del administrador. los admins vienen precargados.
+// clase con constructor para crear admins
 class Admin {
     constructor(id, nombre, usuario, password) {
         this.id = id;

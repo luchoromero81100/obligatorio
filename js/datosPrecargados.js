@@ -1,17 +1,13 @@
-// crea la instancia única del sistema y la llena con datos al arrancar.
-// como el estado vive en memoria, al recargar la página se reinicia todo.
-
 // instancia global del sistema (también la usa pantallas.js)
-const miSistema = new Sistema();
+const miSistema = new Sistema(); //lo hacemos con const porque no se deberia reasignar esto nunca, osea no varia
 
-// administradores precargados: agregarAdmin(nombre, usuario, password)
+// llamo la funcion mi "agregarAdmin" con los argumentos  precargados, deben ser 3
 miSistema.agregarAdmin("Luciano", "Luciano", "Admin123");
 miSistema.agregarAdmin("Gerónimo", "Gerónimo", "Admin123");
 miSistema.agregarAdmin("Surén", "Surén", "Admin123");
 
-// postulantes con niveles y áreas variados.
-// las áreas usan solo el conjunto del registro: tecnología, diseño, marketing, administración, otros.
-// registrarPostulante(usuario, password, nombreCompleto, nivel, area)
+// deben ser 15 postulantes
+// los argunemtnos a pasar son nombre de usuario, pass, nombre completo, nivel y area
 miSistema.registrarPostulante("usuario1", "Postulante123", "Ana Pérez", "Junior", "Tecnología");
 miSistema.registrarPostulante("usuario2", "Postulante123", "Bruno Díaz", "Senior", "Diseño");
 miSistema.registrarPostulante("usuario3", "Postulante123", "Carla Gómez", "Semi-Senior", "Tecnología");
@@ -28,8 +24,7 @@ miSistema.registrarPostulante("usuario13", "Postulante123", "Marta Ortiz", "Seni
 miSistema.registrarPostulante("usuario14", "Postulante123", "Nicolás Bru", "Junior", "Tecnología");
 miSistema.registrarPostulante("usuario15", "Postulante123", "Olivia Sanz", "Semi-Senior", "Diseño");
 
-// ofertas con distintos niveles, áreas y tres destacadas.
-// agregarOferta(titulo, empresa, descripcion, nivel, area, limite, vacantes, destacada)
+// ofertas con distintos niveles, areas y tres destacadas con varias vacantes
 miSistema.agregarOferta("Desarrollador Front-end Junior", "Tech Solutions", "Buscamos un dev apasionado por HTML, CSS y JS.", "Junior", "Tecnología", 5, 3, true);          // job_offer_1
 miSistema.agregarOferta("Diseñador UX/UI Senior", "Creative Agency", "Diseño de interfaces limpias y prototipado rápido.", "Senior", "Diseño", 3, 2, true);                  // job_offer_2
 miSistema.agregarOferta("Backend Developer", "Cloud Services", "Desarrollo de APIs robustas y escalables.", "Semi-Senior", "Tecnología", 6, 2, false);                       // job_offer_3
@@ -41,16 +36,14 @@ miSistema.agregarOferta("Ejecutivo de Ventas", "Retail Corp", "Atención a clien
 miSistema.agregarOferta("Content Manager", "Media Buzz", "Redacción de artículos y estrategia de contenidos.", "Semi-Senior", "Marketing", 5, 1, false);                     // job_offer_9
 miSistema.agregarOferta("QA Tester Manual", "Quality First", "Pruebas de software y reporte de bugs.", "Junior", "Tecnología", 6, 3, false);                                 // job_offer_10
 
-// función auxiliar para crear una postulación buscando por usuario e id de oferta.
-// se usa para no repetir el mismo bloque de búsqueda en cada postulación.
+// helper para crear una postulación usando usuario y la id de oferta.
 function precargarPostulacion(usuario, idOferta) {
     let postulante = miSistema.buscarPostulantePorUsuario(usuario);
     let oferta = miSistema.buscarOfertaPorId(idOferta);
     miSistema.crearPostulacion(postulante, oferta);
 }
 
-// postulaciones: se crean todas como pendientes y respetan la compatibilidad de niveles.
-// el orden de creación fija los ids job_1 .. job_20.
+// acá la ejecuto
 precargarPostulacion("usuario1", "JOB_OFFER_1");   // job_1
 precargarPostulacion("usuario10", "JOB_OFFER_1");  // job_2
 precargarPostulacion("usuario14", "JOB_OFFER_1");  // job_3
@@ -72,13 +65,12 @@ precargarPostulacion("usuario13", "JOB_OFFER_9");  // job_18
 precargarPostulacion("usuario1", "JOB_OFFER_10");  // job_19
 precargarPostulacion("usuario10", "JOB_OFFER_10"); // job_20
 
-// se procesan algunas postulaciones para que haya estados variados
-// (aceptadas, rechazadas e inactivas por vacantes cubiertas).
+// se pre procesan algunas postulaciones para que haya estados variados
 miSistema.aceptarPostulacion("JOB_1");   // job_offer_1: aceptada (1 de 3 vacantes), sigue ACTIVA y destacada
 miSistema.aceptarPostulacion("JOB_2");   // job_offer_1: otra aceptada (2 de 3), aún quedan vacantes → sigue ACTIVA
 miSistema.aceptarPostulacion("JOB_4");   // job_offer_2: aceptada (1 de 2 vacantes), sigue ACTIVA y destacada
 miSistema.aceptarPostulacion("JOB_6");   // job_offer_3: una aceptada, sigue activa con pendientes
 miSistema.aceptarPostulacion("JOB_14");  // job_offer_7: cubre su única vacante, se inactiva y rechaza la pendiente
 
-// cierre lógico de una oferta: queda en el array con estado cerrada
+// cierre lógico como mostró el profe en clase, queda en el array con estado cerrada
 miSistema.cerrarOferta("JOB_OFFER_8");

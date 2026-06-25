@@ -1,4 +1,4 @@
-// molde simple de una oferta laboral. la lógica que cambia su estado vive en sistema.
+// clase de una oferta laboral.
 class OfertaLaboral {
     constructor(id, titulo, empresa, descripcion, nivelRequerido, area, limitePostulaciones, cantidadVacantes, destacada) {
         this.id = id;
@@ -7,8 +7,8 @@ class OfertaLaboral {
         this.descripcion = descripcion;
         this.nivelRequerido = nivelRequerido;
         this.area = area;
-        this.limitePostulaciones = limitePostulaciones; // cuántos pueden anotarse
-        this.cantidadVacantes = cantidadVacantes;       // cuántos se contratan
+        this.limitePostulaciones = limitePostulaciones; // cuántos pueden potularce
+        this.cantidadVacantes = cantidadVacantes;       // cuántos se contratan 
         this.destacada = destacada;
         // el estado arranca siempre en activa
         this.estado = "Activa";

@@ -135,9 +135,21 @@ button:hover {
     background-color: #e08e0b;
 }
 
-/* Login y registro */
-#seccion-login,
-#seccion-registro {
+/* =========================================================
+   Secciones: ocultas por defecto, visibles con .activa
+   El JS solo agrega/quita la clase; el "cómo" se muestra es CSS
+   ========================================================= */
+section {
+    display: none;
+}
+
+section.activa {
+    display: block;
+}
+
+/* Login y registro se centran con flex cuando están activos */
+#seccion-login.activa,
+#seccion-registro.activa {
     display: flex;
     justify-content: center;
     align-items: center;

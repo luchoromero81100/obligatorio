@@ -1,4 +1,4 @@
-// molde simple del postulante. su identificador único es el usuario.
+// clase para crear postulante
 class Postulante {
     constructor(usuario, password, nombreCompleto, nivelExperiencia, areaInteres) {
         this.usuario = usuario;
