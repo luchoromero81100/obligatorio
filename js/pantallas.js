@@ -90,9 +90,7 @@ function procesarRegistro() {
 
     // Si fue exitoso, volvemos al login después de 1.5 segundos
     if (resultado == "Registro exitoso") {
-        setTimeout(function () {
-            mostrarSeccion("seccion-login");
-        }, 1500);
+        mostrarSeccion("seccion-login");
     }
 }
 
@@ -297,15 +295,19 @@ window.procesarPostulacion = function (idOferta) {
     let mensajeResultado = miSistema.crearPostulacion(usuarioLogueado, ofertaEncontrada);
 
     if (mensajeResultado == "Postulación realizada correctamente") {
-        lblMensaje.innerText = mensajeResultado;
-        // Refrescamos la tabla actual para reflejar los cambios
+        // Refrescamos la tabla (lo que destruye el label), luego lo buscamos de nuevo y escribimos
         if (seccionDestacadas != null && seccionDestacadas.style.display != "none") {
             mostrarOfertasDestacadas();
+            let lbl = document.querySelector("#lbl-mensaje-postulacion-destacada");
+            if (lbl != null) { lbl.innerText = "✔ Postulación exitosa"; lbl.style.color = "green"; }
         } else {
             mostrarOfertasPostulante();
+            let lbl = document.querySelector("#lbl-mensaje-postulacion");
+            if (lbl != null) { lbl.innerText = "✔ Postulación exitosa"; lbl.style.color = "green"; }
         }
     } else {
         lblMensaje.innerText = mensajeResultado;
+        lblMensaje.style.color = "red";
     }
 };
 
@@ -580,9 +582,9 @@ window.guardarEdicionOferta = function (idOferta) {
     // Refrescamos el listado (si se guardó bien, el formulario se cierra)
     if (resultado.includes("correctamente")) {
         mostrarListadoOfertasAdmin();
-        // También recargamos las "Postulaciones Recibidas" para que reflejen
-        // los datos editados de la oferta (título, empresa, etc.) en tiempo real.
+        // Recargamos postulaciones y destacadas para reflejar los datos editados en tiempo real
         mostrarPostulacionesAdmin();
+        mostrarOfertasDestacadas();
     }
 };
 

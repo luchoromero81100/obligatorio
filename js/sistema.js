@@ -1,22 +1,17 @@
-// clase controladora: guarda todos los datos y concentra la lógica de negocio.
-// la interfaz nunca toca los arrays directo, solo llama a estos métodos.
+// clase sistema para prevenir modificaciones externas
 class Sistema {
-    // arrays privados: no se pueden modificar desde afuera de la clase
+    // arrays privados
     #postulantes = [];
     #admins = [];
     #ofertas = [];
     #postulaciones = [];
 
     // contadores para armar los ids autoincrementales
-    #contadorOferta = 0;        // genera job_offer_1, job_offer_2...
-    #contadorPostulacion = 0;   // genera job_1, job_2...
-    #contadorAdmin = 0;         // genera 1, 2, 3...
-
-    constructor() {
-        // arranca vacío: los arrays se llenan después con la precarga
-    }
-
-    // agrega un postulante ya creado al array
+    #contadorOferta = 0;        // genera job_offer_1, job_offer_2... esto es para las ofertas creadas por los admins
+    #contadorPostulacion = 0;   // genera job_1, job_2... esto es para las postulaciones de los aplicantes
+    #contadorAdmin = 0;         // para el id del admin
+    
+    // pushea postulantes ya normalizados en otra funcion
     agregarPostulante(postulante) {
         this.#postulantes.push(postulante);
     }
@@ -28,10 +23,10 @@ class Sistema {
         this.#admins.push(admin);
     }
 
-    // busca un postulante por su usuario; devuelve el objeto o null
+    // busca un postulante por su usuario; devuelve el objeto o null. Para loguearse
     buscarPostulantePorUsuario(usuario) {
         for (let i = 0; i < this.#postulantes.length; i++) {
-            // se compara sin distinguir mayúsculas/minúsculas
+            // insensitive
             if (this.#postulantes[i].usuario.toLowerCase() == usuario.toLowerCase()) {
                 return this.#postulantes[i];
             }
@@ -42,6 +37,7 @@ class Sistema {
     // busca un admin por su usuario; devuelve el objeto o null
     buscarAdminPorUsuario(usuario) {
         for (let i = 0; i < this.#admins.length; i++) {
+            // insensitive tambien
             if (this.#admins[i].usuario.toLowerCase() == usuario.toLowerCase()) {
                 return this.#admins[i];
             }
@@ -49,7 +45,7 @@ class Sistema {
         return null;
     }
 
-    // busca una oferta por su id; devuelve el objeto o null
+    // busca una oferta por su id; devuelve el objeto o null, esto se va a usar en funciones futuras para cerrar ofertas y editar ofertas
     buscarOfertaPorId(id) {        for (let i = 0; i < this.#ofertas.length; i++) {
             if (this.#ofertas[i].id == id) {
                 return this.#ofertas[i];
@@ -58,7 +54,7 @@ class Sistema {
         return null;
     }
 
-    // devuelve una copia del array de ofertas (no el original, para protegerlo)
+    // el spread devuelve una copia del array de ofertas (no el original, para protegerlo) y que no se pueda modificar desde afuera, si no, es como si le bloqueara el acceso con la propiedad privada pero le entrego el array
     obtenerTodasLasOfertas() {
         return [...this.#ofertas];
     }
@@ -68,7 +64,7 @@ class Sistema {
         return this.buscarPostulantePorUsuario(usuario) != null;
     }
 
-    // valida la contraseña: mínimo 5 caracteres, con mayúscula, minúscula y número
+    // valida la contraseña: mínimo 5 caracteres, con mayúscula, minúscula y numero
     validarPassword(password) {
         if (password.length < 5) {
             return false;
@@ -77,7 +73,7 @@ class Sistema {
         let tieneMinus = false;
         let tieneNumero = false;
         for (let i = 0; i < password.length; i++) {
-            // se usa el código del carácter para clasificarlo
+            // se usa el codigo ASCII del carácter para clasificarlo
             let codigo = password.charCodeAt(i);
             if (codigo >= 65 && codigo <= 90) { tieneMayus = true; }
             if (codigo >= 97 && codigo <= 122) { tieneMinus = true; }
@@ -96,7 +92,7 @@ class Sistema {
         if (usuario.length < 5) {
             return "El nombre de usuario debe tener al menos 5 caracteres";
         }
-        // el usuario no puede estar repetido
+        // el usuario no puede estar repetido (funcion de arriba)
         if (this.existeUsuario(usuario)) {
             return "El nombre de usuario ya existe";
         }
@@ -108,7 +104,6 @@ class Sistema {
         if (!this.validarPassword(password)) {
             return "La contraseña debe contener al menos una mayúscula, una minúscula y un número";
         }
-        // recién acá, con todo válido, se crea el postulante
         let nuevo = new Postulante(usuario, password, nombreCompleto, nivel, area);
         this.agregarPostulante(nuevo);
         return "Registro exitoso";
