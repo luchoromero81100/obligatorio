@@ -34,7 +34,7 @@ class Sistema {
         return null;
     }
 
-    // busca un admin por su usuario; devuelve el objeto o null
+    // busca un admin por su usuario Y devuelve el objeto o null
     buscarAdminPorUsuario(usuario) {
         for (let i = 0; i < this.#admins.length; i++) {
             // insensitive tambien
@@ -45,7 +45,7 @@ class Sistema {
         return null;
     }
 
-    // busca una oferta por su id; devuelve el objeto o null, esto se va a usar en funciones futuras para cerrar ofertas y editar ofertas
+    // busca una oferta por su id Y devuelve el objeto o null, esto se va a usar en funciones futuras para cerrar ofertas y editar ofertas
     buscarOfertaPorId(id) {        for (let i = 0; i < this.#ofertas.length; i++) {
             if (this.#ofertas[i].id == id) {
                 return this.#ofertas[i];
@@ -79,7 +79,10 @@ class Sistema {
             if (codigo >= 97 && codigo <= 122) { tieneMinus = true; }
             if (codigo >= 48 && codigo <= 57) { tieneNumero = true; }
         }
-        return tieneMayus && tieneMinus && tieneNumero;
+        if (tieneMayus == true && tieneMinus == true && tieneNumero == true) {
+            return true;
+        }
+        return false;
     }
 
     // registra un postulante validando paso a paso; devuelve un mensaje de resultado
@@ -109,7 +112,7 @@ class Sistema {
         return "Registro exitoso";
     }
 
-    // login de postulante: devuelve el objeto si usuario y contraseña coinciden, si no null
+    // login de postulante devuelve el objeto si usuario y contraseña coinciden, si no retrona null
     loginPostulante(usuario, password) {
         let postulante = this.buscarPostulantePorUsuario(usuario);
         if (postulante != null && postulante.password == password) {
@@ -118,7 +121,7 @@ class Sistema {
         return null;
     }
 
-    // login de admin: recorre los admins y devuelve el que coincide, si no null
+    // recorre los admins y devuelve el que coincide, si no null
     loginAdmin(usuario, password) {
         for (let i = 0; i < this.#admins.length; i++) {
             if (this.#admins[i].usuario.toLowerCase() == usuario.toLowerCase() && this.#admins[i].password == password) {
@@ -128,7 +131,7 @@ class Sistema {
         return null;
     }
 
-    // crea una oferta validando los datos; devuelve un mensaje de resultado
+    // crea una oferta validando los datos y un mensaje
     agregarOferta(titulo, empresa, descripcion, nivel, area, limite, vacantes, destacada) {
         if (titulo.trim() == "" || empresa.trim() == "" || descripcion.trim() == "") {
             return "Debe completar todos los campos";
@@ -152,7 +155,7 @@ class Sistema {
         return "Oferta creada correctamente";
     }
 
-    // cierre lógico: cambia el estado a cerrada pero no borra la oferta del array
+    // cierre logico, cambia el estado a cerrada pero no borra la oferta del array
     cerrarOferta(idOferta) {
         let oferta = this.buscarOfertaPorId(idOferta);
         if (oferta == null) {
@@ -195,9 +198,7 @@ class Sistema {
         return "Oferta actualizada correctamente";
     }
 
-    // regla de compatibilidad de nivel entre postulante y oferta.
-    // supuesto: el postulante solo puede a ofertas de su mismo nivel,
-    // salvo el senior que puede a cualquier nivel.
+    // comprobamos si se debe mostrar o no la oferta sgun el postulante
     esCompatibleNivel(nivelPostulante, nivelOferta) {
         if (nivelPostulante == "Senior") {
             return true;
@@ -216,14 +217,14 @@ class Sistema {
         return false;
     }
 
-    // arma la lista de ofertas a las que el postulante se puede postular.
-    // una oferta entra si: está activa, es compatible de nivel y todavía no se postuló.
-    // si soloAreaInteres es true, además debe coincidir el área de interés.
+    // arma un array de ofertas a las que el postulante se puede postular.
+    // segun siestá activa, es compatible de nivel y todavía no se postuló.
+    // si "soloAreaInteres" es true, además debe coincidir el área de interés.
     obtenerOfertasParaPostulante(postulante, soloAreaInteres) {
         let resultado = [];
         for (let i = 0; i < this.#ofertas.length; i++) {
             let o = this.#ofertas[i];
-            if (o.estado == "Activa" && this.esCompatibleNivel(postulante.nivelExperiencia, o.nivelRequerido) && !this.yaSePostulo(postulante, o)) {
+            if (o.estado == "Activa" && this.esCompatibleNivel(postulante.nivelExperiencia, o.nivelRequerido) && this.yaSePostulo(postulante, o) == false) {
                 if (soloAreaInteres == false || o.area == postulante.areaInteres) {
                     resultado.push(o);
                 }
@@ -240,9 +241,9 @@ class Sistema {
         }
         // solo se puede postular a ofertas activas
         if (oferta.estado != "Activa") {
-            return "No es posible postularse: la oferta no está disponible actualmente.";
+            return "No es posible postularse porque la oferta no está disponible actualmente.";
         }
-        // se arma el id con el formato job_n
+        // se arma el id con el formato job_numero
         this.#contadorPostulacion = this.#contadorPostulacion + 1;
         let id = "JOB_" + this.#contadorPostulacion;
         let nuevaPostulacion = new Postulacion(id, oferta, postulante, "Pendiente");
@@ -307,7 +308,8 @@ class Sistema {
         return pendientes;
     }
 
-    // cuenta cuántas postulaciones de una oferta están en un estado dado
+    // cuenta cuántas postulaciones de una oferta están en cierto estado
+    // se usa despues para las estadisticas
     contarPostulacionesDeOferta(oferta, estado) {
         let contador = 0;
         for (let i = 0; i < this.#postulaciones.length; i++) {
@@ -331,8 +333,7 @@ class Sistema {
         return contador;
     }
 
-    // acepta una postulación y aplica los efectos en cascada sobre la oferta.
-    // devuelve un mensaje explicando qué pasó.
+    // acepta una postulación y aplica estados de inactividad y rechaza otras y devuelve un mensaje
     aceptarPostulacion(idPostulacion) {
         // se busca la postulación por id
         let postulacion = null;
@@ -341,15 +342,6 @@ class Sistema {
                 postulacion = this.#postulaciones[i];
             }
         }
-
-        if (postulacion == null) {
-            return "No se encontró la postulación especificada.";
-        }
-        if (postulacion.estado != "Pendiente") {
-            return "La postulación ya ha sido procesada.";
-        }
-
-        // se marca como aceptada
         postulacion.estado = "Aceptada";
         let oferta = postulacion.oferta;
 
@@ -357,7 +349,7 @@ class Sistema {
         let rechazadasAutomaticas = 0;
         let motivo = "";
 
-        // si se cubrieron todas las vacantes: se rechazan las pendientes y la oferta se inactiva
+        // si se cubrieron todas las vacantes se rechazan las pendientes y la oferta se inactiva
         if (aceptadas >= oferta.cantidadVacantes) {
             for (let i = 0; i < this.#postulaciones.length; i++) {
                 let p = this.#postulaciones[i];
@@ -368,13 +360,6 @@ class Sistema {
             }
             oferta.estado = "Inactiva";
             motivo = "vacantes cubiertas";
-        } else {
-            // si no, se controla si se alcanzó el límite de anotados
-            let total = this.contarTotalPostulacionesDeOferta(oferta);
-            if (total >= oferta.limitePostulaciones) {
-                oferta.estado = "Inactiva";
-                motivo = "límite de postulaciones alcanzado";
-            }
         }
 
         // mensaje final con el resultado del procesamiento
@@ -410,7 +395,7 @@ class Sistema {
         return listaEstadisticas;
     }
 
-    // cuenta cuántas ofertas hay en cada estado y devuelve un objeto con los totales
+    // cuenta cuantas ofertas hay en cada estado y devuelve un objeto con los totales
     contarOfertasPorEstado() {
         let activas = 0;
         let inactivas = 0;
@@ -442,7 +427,7 @@ class Sistema {
             // las vacantes cubiertas son las postulaciones aceptadas de cada oferta
             vacantesCubiertas = vacantesCubiertas + this.contarPostulacionesDeOferta(o, "Aceptada");
         }
-        // se evita dividir por cero cuando no hay vacantes
+        // si es 0 mandamos 0
         if (totalVacantes == 0) {
             return 0;
         }
@@ -450,15 +435,10 @@ class Sistema {
     }
 
     // busca el postulante con más postulaciones activas usando el patrón de máximo.
-    // supuesto: activas = pendientes + aceptadas (no cuenta las rechazadas).
     postulanteConMasPostulacionesActivas() {
-        if (this.#postulantes.length == 0) {
-            return null;
-        }
-
         let maxPostulante = null;
-        let maxActivas = -1; // arranca en -1 para que cualquiera con 0 o más lo supere
-
+        let maxActivas = 0; 
+        
         for (let i = 0; i < this.#postulantes.length; i++) {
             let post = this.#postulantes[i];
             let susPostulaciones = this.obtenerPostulacionesDePostulante(post);
@@ -479,6 +459,9 @@ class Sistema {
             }
         }
 
+        if (maxActivas == 0) {
+            return null;
+        }
         return maxPostulante;
     }
 }

@@ -246,11 +246,11 @@ function procesarPostulacion(idOferta) {
         if (seccionDestacadas.classList.contains("activa")) {
             mostrarOfertasDestacadas(); 
             let lbl = document.querySelector("#lbl-mensaje-postulacion-destacada");
-            if (lbl != null) { lbl.innerText = "Postulación exitosa!"; lbl.style.color = "green"; }
+            lbl.innerText = "Postulación exitosa!"; lbl.style.color = "green";
         } else {
             mostrarOfertasPostulante();
             let lbl = document.querySelector("#lbl-mensaje-postulacion");
-            if (lbl != null) { lbl.innerText = "Postulación exitosa!"; lbl.style.color = "green"; }
+            lbl.innerText = "Postulación exitosa!"; lbl.style.color = "green";
         }
     } else {
         lblMensaje.innerText = mensajeResultado;
@@ -527,9 +527,7 @@ function guardarEdicionOferta(idOferta) {
     let resultado = miSistema.editarOferta(idOferta, titulo, empresa, descripcion, nivel, area, limite, vacantes, destacada);
 
     let lbl = document.querySelector("#lbl-edit-resultado");
-    if (lbl != null) {
-        lbl.innerText = resultado;
-    }
+    lbl.innerText = resultado;
 
     // actualizamos el listado (si se guardó bien, el formulario se cierra)
     if (resultado.includes("correctamente")) {
@@ -587,7 +585,7 @@ function mostrarEstadisticas() {
     if (top != null) {
         html += "<p>Postulante con más postulaciones activas: " + top.nombreCompleto + "</p>";
     } else {
-        html += "<p>No hay postulantes cargados.</p>";
+        html += "<p>No hay postulantes con postulaciones activas.</p>";
     }
 
     contenedor.innerHTML = html;
