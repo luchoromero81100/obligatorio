@@ -366,65 +366,30 @@ function mostrarMisPostulaciones() {
 // --- CATÁLOGO DE DESTACADAS (POSTULANTE) ---
 function mostrarOfertasDestacadas() {
     let contenedor = document.querySelector("#contenedor-ofertas-destacadas");
-    if (contenedor == null) { return; }
+    if (!contenedor) return;
 
-    let listaDestacadas = miSistema.obtenerOfertasDestacadas();
+    // 1. Obtenemos todas las destacadas
+    let listaCompleta = miSistema.obtenerOfertasDestacadas();
 
-    if (listaDestacadas.length == 0) {
-        contenedor.innerHTML = "<p>No hay ofertas destacadas disponibles</p>";
+    // 2. Filtramos: solo dejamos las que el usuario NO se haya postulado aún
+    let listaFiltrada = listaCompleta.filter(o => !miSistema.yaSePostulo(usuarioLogueado, o));
+
+    if (listaFiltrada.length == 0) {
+        contenedor.innerHTML = "<p>No hay más ofertas destacadas disponibles para ti.</p>";
         return;
     }
 
-    let tablaHTML = `
-        <table class="tabla-destacadas">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Empresa</th>
-                    <th>Descripción</th>
-                    <th>Nivel</th>
-                    <th>Área</th>
-                    <th>Vacantes</th>
-                    <th>Límite</th>
-                    <th>Destacada</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    let tablaHTML = `<div class="table-responsive"><table>
+        <thead><tr><th>ID</th><th>Título</th><th>Empresa</th><th>Nivel</th><th>Área</th><th>Acción</th></tr></thead>
+        <tbody>`;
 
-    for (let i = 0; i < listaDestacadas.length; i++) {
-        let oferta = listaDestacadas[i];
-        tablaHTML += `
-            <tr>
-                <td>${oferta.id}</td>
-                <td><strong>${oferta.titulo}</strong></td>
-                <td>${oferta.empresa}</td>
-                <td><em>${oferta.descripcion}</em></td>
-                <td>${oferta.nivelRequerido}</td>
-                <td>${oferta.area}</td>
-                <td>${oferta.cantidadVacantes}</td>
-                <td>${oferta.limitePostulaciones}</td>
-                <td>Sí</td>
-                <td>
-                    <div class="acciones-tabla">
-                        <button class="btn-destacada" onclick="procesarPostulacion('${oferta.id}')">Postularme</button>
-                    </div>
-                </td>
-            </tr>
-        `;
+    for (let o of listaFiltrada) {
+        tablaHTML += `<tr><td>${o.id}</td><td>${o.titulo}</td><td>${o.empresa}</td><td>${o.nivelRequerido}</td><td>${o.area}</td>
+        <td><button onclick="procesarPostulacion('${o.id}')">Postularme</button></td></tr>`;
     }
-
-    tablaHTML += `
-            </tbody>
-        </table>
-        <p id="lbl-mensaje-postulacion-destacada" class="mensaje"></p>
-    `;
-
+    tablaHTML += `</tbody></table><p id="lbl-mensaje-postulacion-destacada"></p></div>`;
     contenedor.innerHTML = tablaHTML;
 }
-
 // --- POSTULACIONES PENDIENTES (ADMIN) ---
 function mostrarPostulacionesAdmin() {
     let contenedor = document.querySelector("#lista-pendientes");
